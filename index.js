@@ -12,70 +12,22 @@ module.exports = function (options) {
     options.theta = typeof options.theta === 'number' ? options.theta : 0.8;
 
     // we require deterministic randomness here
-    var random = require('ngraph.random').random(1984);
-
-    // the following structures are here to reduce memory pressure
-    // when constructing BH-tree.
-    function InsertStackElement(node, body) {
-        this.node = node;
-        this.body = body;
-    }
-
-    function InsertStack () {
-        this.stack = [];
-        this.popIdx = 0;
-    }
-
-    InsertStack.prototype = {
-        isEmpty: function() {
-            return this.popIdx === 0;
-        },
-        push: function (node, body) {
-            var item = this.stack[this.popIdx];
-            if (!item) {
-                this.stack[this.popIdx] = new InsertStackElement(node, body);
-            } else {
-                item.node = node;
-                item.body = body;
-            }
-            ++this.popIdx;
-        },
-        pop: function () {
-            if (this.popIdx > 0) {
-                return this.stack[--this.popIdx];
-            }
-        },
-        reset: function () {
-            this.popIdx = 0;
-        }
-    };
-
+    var random = require('ngraph.random').random(1984),
+        Node = require('./node'),
+        InsertStack = require('./insertStack'),
+        isSamePosition = require('./isSamePosition');
 
     var gravity = options.gravity,
         updateQueue = [],
         insertStack = new InsertStack(),
         theta = options.theta,
 
-        Node = function () {
-            this.body = null;
-            this.quads = [];
-            this.mass = 0;
-            this.massX = 0;
-            this.massY = 0;
-            this.left = 0;
-            this.top = 0;
-            this.bottom = 0;
-            this.right = 0;
-            this.isInternal = false;
-        },
-
         nodesCache = [],
         currentInCache = 0,
         newNode = function () {
             // To avoid pressure on GC we reuse nodes.
-            var node;
-            if (nodesCache[currentInCache]) {
-                node = nodesCache[currentInCache];
+            var node = nodesCache[currentInCache];
+            if (node) {
                 node.quads[0] = null;
                 node.quads[1] = null;
                 node.quads[2] = null;
@@ -94,13 +46,6 @@ module.exports = function (options) {
         },
 
         root = newNode(),
-
-        isSamePosition = function (point1, point2) {
-            var dx = Math.abs(point1.x - point2.x);
-            var dy = Math.abs(point1.y - point2.y);
-
-            return (dx < 1e-8 && dy < 1e-8);
-        },
 
         // Inserts body to the tree
         insert = function (newBody) {
@@ -128,13 +73,13 @@ module.exports = function (options) {
                         top = node.top,
                         bottom = (node.bottom + top) / 2;
 
-                    if (x > right) {// somewhere in the eastern part.
+                    if (x > right) { // somewhere in the eastern part.
                         quadIdx = quadIdx + 1;
                         var oldLeft = left;
                         left = right;
                         right = right + (right - oldLeft);
                     }
-                    if (y > bottom) {// and in south.
+                    if (y > bottom) { // and in south.
                         quadIdx = quadIdx + 2;
                         var oldTop = top;
                         top = bottom;
@@ -158,7 +103,7 @@ module.exports = function (options) {
                     insertStack.push(child, body);
                 } else if (node.body) {
                     // We are trying to add to the leaf node.
-                    // To achieve this we have to convert current leaf into internal node
+                    // We have to convert current leaf into internal node
                     // and continue adding two nodes.
                     var oldBody = node.body;
                     node.body = null; // internal nodes do not cary bodies
@@ -271,7 +216,7 @@ module.exports = function (options) {
             }
         },
 
-        init = function (bodies) {
+        insertBodies = function (bodies) {
             var x1 = Number.MAX_VALUE,
                 y1 = Number.MAX_VALUE,
                 x2 = Number.MIN_VALUE,
@@ -309,8 +254,7 @@ module.exports = function (options) {
         };
 
     return {
-        insert : insert,
-        init : init,
+        insertBodies : insertBodies,
         update : update,
         options : function (newOptions) {
             if (newOptions) {
@@ -324,3 +268,4 @@ module.exports = function (options) {
         }
     };
 };
+
