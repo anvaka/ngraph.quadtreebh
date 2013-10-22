@@ -1,6 +1,6 @@
 var createQuadTree = require('../'),
     createBodies = require('./bodiesGenerator'),
-    numberOfBodies = 400000,
+    numberOfBodies = 1000000,
     theta = 1.2;
 
 logMessage('Running performance test');
@@ -11,7 +11,7 @@ var bodies = createBodies(numberOfBodies);
 var quadTree = createQuadTree({theta: theta});
 
 var startInit = +new Date();
-quadTree.init(bodies);
+quadTree.insertBodies(bodies);
 var initMS = +new Date() - startInit;
 logMessage('Creating tree: ' + initMS + 'ms');
 
