@@ -1,0 +1,5 @@
+Oct 22:
+  Node: 0.10.16, v8: 3.14.5.9
+
+  Creating tree: 13222ms
+  Calculating NBody for 1000000 bodies. Theta: 1.2; time: 18577ms
