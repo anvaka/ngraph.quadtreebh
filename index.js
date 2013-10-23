@@ -35,7 +35,6 @@ module.exports = function (options) {
                 node.body = null;
                 node.mass = node.massX = node.massY = 0;
                 node.left = node.right = node.top = node.bottom = 0;
-                node.isInternal = false;
             } else {
                 node = new Node();
                 nodesCache[currentInCache] = node;
@@ -57,7 +56,7 @@ module.exports = function (options) {
                     node = stackItem.node,
                     body = stackItem.body;
 
-                if (node.isInternal) {
+                if (!node.body) {
                     // This is internal node. Update the total mass of the node and center-of-mass.
                     var x = body.location.x;
                     var y = body.location.y;
@@ -95,19 +94,19 @@ module.exports = function (options) {
                         child.top = top;
                         child.right = right;
                         child.bottom = bottom;
+                        child.body = body;
 
                         node.quads[quadIdx] = child;
+                    } else {
+                        // continue searching in this quadrant.
+                        insertStack.push(child, body);
                     }
-
-                    // continue searching in this quadrant.
-                    insertStack.push(child, body);
-                } else if (node.body) {
+                } else {
                     // We are trying to add to the leaf node.
                     // We have to convert current leaf into internal node
                     // and continue adding two nodes.
                     var oldBody = node.body;
                     node.body = null; // internal nodes do not cary bodies
-                    node.isInternal = true;
 
                     if (isSamePosition(oldBody.location, body.location)) {
                         // Prevent infinite subdivision by bumping one node
@@ -133,11 +132,8 @@ module.exports = function (options) {
                     // Next iteration should subdivide node further.
                     insertStack.push(node, oldBody);
                     insertStack.push(node, body);
-                } else {
-                    // Node has no body. Put it in here.
-                    node.body = body;
                 }
-            }
+           }
         },
 
         update = function (sourceBody) {
@@ -247,7 +243,10 @@ module.exports = function (options) {
             root.top = y1;
             root.bottom = y2;
 
-            i = max;
+            i = max - 1;
+            if (i > 0) {
+              root.body = bodies[i];
+            }
             while (i--) {
                 insert(bodies[i], root);
             }
@@ -255,7 +254,7 @@ module.exports = function (options) {
 
     return {
         insertBodies : insertBodies,
-        update : update,
+        updateBodyForce : update,
         options : function (newOptions) {
             if (newOptions) {
                 if (typeof newOptions.gravity === 'number') { gravity = newOptions.gravity; }

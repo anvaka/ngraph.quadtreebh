@@ -17,7 +17,7 @@ logMessage('Creating tree: ' + initMS + 'ms');
 
 var startUpdate = +new Date();
 for (var j = 0; j < bodies.length; ++j) {
-  quadTree.update(bodies[j]);
+  quadTree.updateBodyForce(bodies[j]);
 }
 var updateMS = +new Date() - startUpdate;
 logMessage(msg + '; time: ' + updateMS + 'ms');
