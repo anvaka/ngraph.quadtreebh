@@ -58,8 +58,8 @@ module.exports = function (options) {
 
                 if (!node.body) {
                     // This is internal node. Update the total mass of the node and center-of-mass.
-                    var x = body.location.x;
-                    var y = body.location.y;
+                    var x = body.pos.x;
+                    var y = body.pos.y;
                     node.mass = node.mass + body.mass;
                     node.massX = node.massX + body.mass * x;
                     node.massY = node.massY + body.mass * y;
@@ -108,7 +108,7 @@ module.exports = function (options) {
                     var oldBody = node.body;
                     node.body = null; // internal nodes do not cary bodies
 
-                    if (isSamePosition(oldBody.location, body.location)) {
+                    if (isSamePosition(oldBody.pos, body.pos)) {
                         // Prevent infinite subdivision by bumping one node
                         // anywhere in this quadrant
                         if (node.right - node.left < 1e-8) {
@@ -123,10 +123,10 @@ module.exports = function (options) {
                             var dx = (node.right - node.left) * offset;
                             var dy = (node.bottom - node.top) * offset;
 
-                            oldBody.location.x = node.left + dx;
-                            oldBody.location.y = node.top + dy;
+                            oldBody.pos.x = node.left + dx;
+                            oldBody.pos.y = node.top + dy;
                             // Make sure we don't bump it out of the box. If we do, next iteration should fix it
-                        } while (isSamePosition(oldBody.location, body.location));
+                        } while (isSamePosition(oldBody.pos, body.pos));
 
                     }
                     // Next iteration should subdivide node further.
@@ -159,8 +159,8 @@ module.exports = function (options) {
                     // If the current node is a leaf node (and it is not source body),
                     // calculate the force exerted by the current node on body, and add this
                     // amount to body's net force.
-                    dx = body.location.x - sourceBody.location.x;
-                    dy = body.location.y - sourceBody.location.y;
+                    dx = body.pos.x - sourceBody.pos.x;
+                    dy = body.pos.y - sourceBody.pos.y;
                     r = Math.sqrt(dx * dx + dy * dy);
 
                     if (r === 0) {
@@ -173,14 +173,14 @@ module.exports = function (options) {
                     // This is standard gravition force calculation but we divide
                     // by r^3 to save two operations when normalizing force vector.
                     v = gravity * body.mass * sourceBody.mass / (r * r * r);
-                    sourceBody.force.x = sourceBody.force.x + v * dx;
-                    sourceBody.force.y = sourceBody.force.y + v * dy;
+                    sourceBody.force.x += v * dx;
+                    sourceBody.force.y += v * dy;
                 } else {
                     // Otherwise, calculate the ratio s / r,  where s is the width of the region
                     // represented by the internal node, and r is the distance between the body
                     // and the node's center-of-mass
-                    dx = node.massX / node.mass - sourceBody.location.x;
-                    dy = node.massY / node.mass - sourceBody.location.y;
+                    dx = node.massX / node.mass - sourceBody.pos.x;
+                    dy = node.massY / node.mass - sourceBody.pos.y;
                     r = Math.sqrt(dx * dx + dy * dy);
 
                     if (r === 0) {
@@ -197,8 +197,8 @@ module.exports = function (options) {
                         // because the region was squarified during tree creation.
                         // Thus there is no difference between using width or height.
                         v = gravity * node.mass * sourceBody.mass / (r * r * r);
-                        sourceBody.force.x = sourceBody.force.x + v * dx;
-                        sourceBody.force.y = sourceBody.force.y + v * dy;
+                        sourceBody.force.x += v * dx;
+                        sourceBody.force.y += v * dy;
                     } else {
                         // Otherwise, run the procedure recursively on each of the current node's children.
 
@@ -223,8 +223,8 @@ module.exports = function (options) {
             // To reduce quad tree depth we are looking for exact bounding box of all particles.
             i = max;
             while (i--) {
-                var x = bodies[i].location.x;
-                var y = bodies[i].location.y;
+                var x = bodies[i].pos.x;
+                var y = bodies[i].pos.y;
                 if (x < x1) { x1 = x; }
                 if (x > x2) { x2 = x; }
                 if (y < y1) { y1 = y; }
