@@ -154,7 +154,9 @@ module.exports = function (options) {
 
                 queueLength -= 1;
                 shiftIdx += 1;
-
+                // technically there should be external "if (body !== sourceBody) {"
+                // but in practice it gives slightghly worse performance, and does not
+                // have impact on layout correctness
                 if (body && body !== sourceBody) {
                     // If the current node is a leaf node (and it is not source body),
                     // calculate the force exerted by the current node on body, and add this
