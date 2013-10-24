@@ -32,3 +32,15 @@ harness.test('Two bodies repel each other', function (t) {
 
   t.end();
 });
+
+harness.test('Can handle two bodies at the same location', function (t) {
+  var tree = createQuadTree();
+  var bodyA = new Body();
+  var bodyB = new Body();
+
+  tree.insertBodies([bodyA, bodyB]);
+  tree.updateBodyForce(bodyA);
+  tree.updateBodyForce(bodyB);
+
+  t.end();
+});
