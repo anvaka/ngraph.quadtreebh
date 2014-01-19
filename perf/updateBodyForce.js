@@ -4,6 +4,7 @@ var Benchmark = require('benchmark');
 var createQuadTree = require('../'),
     numberOfBodies = 10000;
 
+console.log('Bodies #' + numberOfBodies);
 var suite = new Benchmark.Suite;
 
 // add tests
@@ -16,7 +17,7 @@ suite.add('Theta 1.2', function() {
     quadTree.updateBodyForce(bodies[j]);
   }
 })
-.add('theta 0.8', function() {
+.add('Theta 0.8', function() {
   var bodies = createBodies(numberOfBodies);
   var quadTree = createQuadTree({theta: 0.8});
   quadTree.insertBodies(bodies);
