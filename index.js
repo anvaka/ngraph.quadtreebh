@@ -1,7 +1,6 @@
 /**
- * This is Barnes Hut simulation algorithm. Implementation
- * is adopted to non-recursive solution, since certain browsers
- * handle recursion extremly bad.
+ * This is Barnes Hut simulation algorithm for 2d case. Implementation
+ * is highly optimized (avoids recusion and gc pressure)
  *
  * http://www.cs.princeton.edu/courses/archive/fall03/cs126/assignments/barnes-hut.html
  */
