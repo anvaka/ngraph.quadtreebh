@@ -193,7 +193,7 @@ module.exports = function (options) {
             r = Math.sqrt(dx * dx + dy * dy);
           }
           // If s / r < θ, treat this internal node as a single body, and calculate the
-          // force it exerts on body b, and add this amount to b's net force.
+          // force it exerts on sourceBody, and add this amount to sourceBody's net force.
           if ((node.right - node.left) / r < theta) {
             // in the if statement above we consider node's width only
             // because the region was squarified during tree creation.

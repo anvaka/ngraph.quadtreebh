@@ -1,10 +1,9 @@
 module.exports = InsertStack;
 
 /**
- * Our implmentation of QuadTree is non-recursive (recursion handled not really
- * well in old browsers). This data structure represent stack of elemnts
- * which we are trying to insert into quad tree. It also avoids unnecessary
- * memory pressue when we are adding more elements
+ * Our implmentation of QuadTree is non-recursive to avoid GC hit
+ * This data structure represent stack of elements
+ * which we are trying to insert into quad tree.
  */
 function InsertStack () {
     this.stack = [];
