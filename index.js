@@ -133,7 +133,7 @@ module.exports = function (options) {
           insertStack.push(node, oldBody);
           insertStack.push(node, body);
         }
-       }
+      }
     },
 
     update = function (sourceBody) {
