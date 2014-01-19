@@ -141,7 +141,7 @@ module.exports = function (options) {
         v,
         dx,
         dy,
-        r,
+        r, fx = 0, fy = 0,
         queueLength = 1,
         shiftIdx = 0,
         pushIdx = 1;
@@ -175,8 +175,8 @@ module.exports = function (options) {
           // This is standard gravition force calculation but we divide
           // by r^3 to save two operations when normalizing force vector.
           v = gravity * body.mass * sourceBody.mass / (r * r * r);
-          sourceBody.force.x += v * dx;
-          sourceBody.force.y += v * dy;
+          fx += v * dx;
+          fy += v * dy;
         } else {
           // Otherwise, calculate the ratio s / r,  where s is the width of the region
           // represented by the internal node, and r is the distance between the body
@@ -199,8 +199,8 @@ module.exports = function (options) {
             // because the region was squarified during tree creation.
             // Thus there is no difference between using width or height.
             v = gravity * node.mass * sourceBody.mass / (r * r * r);
-            sourceBody.force.x += v * dx;
-            sourceBody.force.y += v * dy;
+            fx += v * dx;
+            fy += v * dy;
           } else {
             // Otherwise, run the procedure recursively on each of the current node's children.
 
@@ -212,6 +212,9 @@ module.exports = function (options) {
           }
         }
       }
+
+      sourceBody.force.x += fx;
+      sourceBody.force.y += fy;
     },
 
     insertBodies = function (bodies) {
