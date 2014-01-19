@@ -24,7 +24,4 @@ module.exports = function Node() {
   this.top = 0;
   this.bottom = 0;
   this.right = 0;
-
-  // Node is internal when it is not a leaf
-  this.isInternal = false;
 };
