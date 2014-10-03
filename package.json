@@ -1,6 +1,6 @@
 {
   "name": "ngraph.quadtreebh",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Quad tree data structure for Barnes-Hut simulation",
   "main": "index.js",
   "scripts": {
