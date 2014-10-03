@@ -5,7 +5,7 @@
  * http://www.cs.princeton.edu/courses/archive/fall03/cs126/assignments/barnes-hut.html
  */
 
-module.exports = function (options) {
+module.exports = function(options) {
   options = options || {};
   options.gravity = typeof options.gravity === 'number' ? options.gravity : -1;
   options.theta = typeof options.theta === 'number' ? options.theta : 0.8;
@@ -23,7 +23,7 @@ module.exports = function (options) {
 
     nodesCache = [],
     currentInCache = 0,
-    newNode = function () {
+    newNode = function() {
       // To avoid pressure on GC we reuse nodes.
       var node = nodesCache[currentInCache];
       if (node) {
@@ -46,7 +46,7 @@ module.exports = function (options) {
     root = newNode(),
 
     // Inserts body to the tree
-    insert = function (newBody) {
+    insert = function(newBody) {
       insertStack.reset();
       insertStack.push(root, newBody);
 
@@ -59,9 +59,9 @@ module.exports = function (options) {
           // This is internal node. Update the total mass of the node and center-of-mass.
           var x = body.pos.x;
           var y = body.pos.y;
-          node.mass += body.mass;
-          node.massX += body.mass * x;
-          node.massY += body.mass * y;
+          node.mass = node.mass + body.mass;
+          node.massX = node.massX + body.mass * x;
+          node.massY = node.massY + body.mass * y;
 
           // Recursively insert the body in the appropriate quadrant.
           // But first find the appropriate quadrant.
@@ -110,13 +110,7 @@ module.exports = function (options) {
           if (isSamePosition(oldBody.pos, body.pos)) {
             // Prevent infinite subdivision by bumping one node
             // anywhere in this quadrant
-            if (node.right - node.left < 1e-8) {
-              // This is very bad, we ran out of precision.
-              // if we do not return from the method we'll get into
-              // infinite loop here. So we sacrifice correctness of layout, and keep the app running
-              // Next layout iteration should get larger bounding box in the first step and fix this
-              return;
-            }
+            var retriesCount = 3;
             do {
               var offset = random.nextDouble();
               var dx = (node.right - node.left) * offset;
@@ -124,9 +118,17 @@ module.exports = function (options) {
 
               oldBody.pos.x = node.left + dx;
               oldBody.pos.y = node.top + dy;
+              retriesCount -= 1;
               // Make sure we don't bump it out of the box. If we do, next iteration should fix it
-            } while (isSamePosition(oldBody.pos, body.pos));
+            } while (retriesCount > 0 && isSamePosition(oldBody.pos, body.pos));
 
+            if (retriesCount === 0 && isSamePosition(oldBody.pos, body.pos)) {
+              // This is very bad, we ran out of precision.
+              // if we do not return from the method we'll get into
+              // infinite loop here. So we sacrifice correctness of layout, and keep the app running
+              // Next layout iteration should get larger bounding box in the first step and fix this
+              return;
+            }
           }
           // Next iteration should subdivide node further.
           insertStack.push(node, oldBody);
@@ -135,12 +137,13 @@ module.exports = function (options) {
       }
     },
 
-    update = function (sourceBody) {
+    update = function(sourceBody) {
       var queue = updateQueue,
         v,
         dx,
         dy,
-        r, fx = 0, fy = 0,
+        r, fx = 0,
+        fy = 0,
         queueLength = 1,
         shiftIdx = 0,
         pushIdx = 1;
@@ -204,10 +207,26 @@ module.exports = function (options) {
             // Otherwise, run the procedure recursively on each of the current node's children.
 
             // I intentionally unfolded this loop, to save several CPU cycles.
-            if (node.quads[0]) { queue[pushIdx] = node.quads[0]; queueLength += 1; pushIdx += 1; }
-            if (node.quads[1]) { queue[pushIdx] = node.quads[1]; queueLength += 1; pushIdx += 1; }
-            if (node.quads[2]) { queue[pushIdx] = node.quads[2]; queueLength += 1; pushIdx += 1; }
-            if (node.quads[3]) { queue[pushIdx] = node.quads[3]; queueLength += 1; pushIdx += 1; }
+            if (node.quads[0]) {
+              queue[pushIdx] = node.quads[0];
+              queueLength += 1;
+              pushIdx += 1;
+            }
+            if (node.quads[1]) {
+              queue[pushIdx] = node.quads[1];
+              queueLength += 1;
+              pushIdx += 1;
+            }
+            if (node.quads[2]) {
+              queue[pushIdx] = node.quads[2];
+              queueLength += 1;
+              pushIdx += 1;
+            }
+            if (node.quads[3]) {
+              queue[pushIdx] = node.quads[3];
+              queueLength += 1;
+              pushIdx += 1;
+            }
           }
         }
       }
@@ -216,7 +235,7 @@ module.exports = function (options) {
       sourceBody.force.y += fy;
     },
 
-    insertBodies = function (bodies) {
+    insertBodies = function(bodies) {
       var x1 = Number.MAX_VALUE,
         y1 = Number.MAX_VALUE,
         x2 = Number.MIN_VALUE,
@@ -229,16 +248,28 @@ module.exports = function (options) {
       while (i--) {
         var x = bodies[i].pos.x;
         var y = bodies[i].pos.y;
-        if (x < x1) { x1 = x; }
-        if (x > x2) { x2 = x; }
-        if (y < y1) { y1 = y; }
-        if (y > y2) { y2 = y; }
+        if (x < x1) {
+          x1 = x;
+        }
+        if (x > x2) {
+          x2 = x;
+        }
+        if (y < y1) {
+          y1 = y;
+        }
+        if (y > y2) {
+          y2 = y;
+        }
       }
 
       // Squarify the bounds.
       var dx = x2 - x1,
         dy = y2 - y1;
-      if (dx > dy) { y2 = y1 + dx; } else { x2 = x1 + dy; }
+      if (dx > dy) {
+        y2 = y1 + dx;
+      } else {
+        x2 = x1 + dy;
+      }
 
       currentInCache = 0;
       root = newNode();
@@ -257,18 +288,24 @@ module.exports = function (options) {
     };
 
   return {
-    insertBodies : insertBodies,
-    updateBodyForce : update,
-    options : function (newOptions) {
+    insertBodies: insertBodies,
+    updateBodyForce: update,
+    options: function(newOptions) {
       if (newOptions) {
-        if (typeof newOptions.gravity === 'number') { gravity = newOptions.gravity; }
-        if (typeof newOptions.theta === 'number') { theta = newOptions.theta; }
+        if (typeof newOptions.gravity === 'number') {
+          gravity = newOptions.gravity;
+        }
+        if (typeof newOptions.theta === 'number') {
+          theta = newOptions.theta;
+        }
 
         return this;
       }
 
-      return {gravity : gravity, theta : theta};
+      return {
+        gravity: gravity,
+        theta: theta
+      };
     }
   };
 };
-
