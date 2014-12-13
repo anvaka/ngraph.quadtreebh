@@ -156,10 +156,8 @@ module.exports = function(options) {
 
         queueLength -= 1;
         shiftIdx += 1;
-        // technically there should be external "if (body !== sourceBody) {"
-        // but in practice it gives slightghly worse performance, and does not
-        // have impact on layout correctness
-        if (body && body !== sourceBody) {
+        var differentBody = (body !== sourceBody);
+        if (body && differentBody) {
           // If the current node is a leaf node (and it is not source body),
           // calculate the force exerted by the current node on body, and add this
           // amount to body's net force.
@@ -179,7 +177,7 @@ module.exports = function(options) {
           v = gravity * body.mass * sourceBody.mass / (r * r * r);
           fx += v * dx;
           fy += v * dy;
-        } else {
+        } else if (differentBody) {
           // Otherwise, calculate the ratio s / r,  where s is the width of the region
           // represented by the internal node, and r is the distance between the body
           // and the node's center-of-mass
