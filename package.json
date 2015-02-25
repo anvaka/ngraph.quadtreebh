@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "tap test/*.js",
-    "perf": "node perf/1m.js"
+    "perf": "npm version && node perf/updateBodyForce.js"
   },
   "repository": {
     "type": "git",
