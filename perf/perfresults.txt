@@ -9,6 +9,6 @@
   v8: '4.1.0.14',
   zlib: '1.2.8' }
 Bodies #10000
-Theta 1.2 x 15.07 ops/sec ±3.45% (29 runs sampled)
-Theta 0.8 x 9.62 ops/sec ±7.59% (28 runs sampled)
+Theta 1.2 x 25.31 ops/sec ±5.01% (46 runs sampled)
+Theta 0.8 x 17.77 ops/sec ±2.60% (45 runs sampled)
 Fastest is Theta 1.2

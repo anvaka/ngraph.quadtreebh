@@ -10,7 +10,10 @@ module.exports = function Node() {
   // 0 | 1
   // -----
   // 2 | 3
-  this.quads = [];
+  this.quad0 = null;
+  this.quad1 = null;
+  this.quad2 = null;
+  this.quad3 = null;
 
   // Total mass of current node
   this.mass = 0;
