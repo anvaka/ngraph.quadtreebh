@@ -242,15 +242,13 @@ module.exports = function(options) {
 
         if (x > right) { // somewhere in the eastern part.
           quadIdx = quadIdx + 1;
-          var oldLeft = left;
           left = right;
-          right = right + (right - oldLeft);
+          right = node.right;
         }
         if (y > bottom) { // and in south.
           quadIdx = quadIdx + 2;
-          var oldTop = top;
           top = bottom;
-          bottom = bottom + (bottom - oldTop);
+          bottom = node.bottom;
         }
 
         var child = getChild(node, quadIdx);
