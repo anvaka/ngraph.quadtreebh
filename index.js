@@ -27,6 +27,12 @@ module.exports = function(options) {
 
   return {
     insertBodies: insertBodies,
+    /**
+     * Gets root node if its present
+     */
+    getRoot: function() {
+      return root;
+    },
     updateBodyForce: update,
     options: function(newOptions) {
       if (newOptions) {
@@ -207,7 +213,7 @@ module.exports = function(options) {
     root.bottom = y2;
 
     i = max - 1;
-    if (i > 0) {
+    if (i >= 0) {
       root.body = bodies[i];
     }
     while (i--) {

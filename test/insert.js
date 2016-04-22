@@ -13,6 +13,17 @@ harness.test('insert and update update forces', function (t) {
   t.end();
 });
 
+harness.test('it can get root', function (t) {
+  var tree = createQuadTree();
+  var body = new Body();
+
+  tree.insertBodies([body]);
+  var root = tree.getRoot();
+  t.ok(root, "Root is present");
+  t.equals(root.body, body, "Body is initialized");
+  t.end();
+});
+
 harness.test('Two bodies repel each other', function (t) {
   var tree = createQuadTree();
   var bodyA = new Body(); bodyA.pos.x = 1; bodyA.pos.y = 0;
